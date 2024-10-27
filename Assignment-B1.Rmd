@@ -1,0 +1,72 @@
+---
+title: "Assignment B-1: Making a function"
+output: github_document
+---
+
+# Exercise 1: Make a Function & Exercise 2: Document your Function
+
+This function, calc_mean_sd, calculates the mean and standard deviation of a specified numeric column in a data frame.
+
+```{r, error = TRUE}
+#' @title Calculate Mean and Standard Deviation
+#' @description This function computes the mean and standard deviation for a specified numeric column in a data frame.
+#' @param data A data frame containing the numeric column.
+#' @param column A character string specifying the name of the numeric column to summarize.
+#' @param na.rm Logical. If TRUE, NA values are removed before computation. Defaults to TRUE.
+#' @return A list with the mean and standard deviation of the specified column.
+#' @export
+calc_mean_sd <- function(data, column, na.rm = TRUE) {
+  if (!is.numeric(data[[column]])) {
+    stop("The specified column must be numeric.")
+  }
+  list(
+    mean = mean(data[[column]], na.rm = na.rm),
+    sd = sd(data[[column]], na.rm = na.rm)
+  )
+}
+```
+
+# Exercise 3: Include examples
+
+```{r, error = TRUE}
+# Create a simple dataset
+simple_data <- data.frame(value = c(1, 2, 3, 4, 5))
+
+# Example 1: Calculate mean and standard deviation of the value column
+calc_mean_sd(simple_data, column = "value")
+
+# Example 2: Handle NA values (add some NA values)
+simple_data_na <- data.frame(value = c(1, 2, NA, 4, 5))
+calc_mean_sd(simple_data_na, column = "value", na.rm = TRUE)
+
+# Example 3: Intentional error (non-numeric column)
+non_numeric_data <- data.frame(value = c("a", "b", "c", "d", "e"))
+calc_mean_sd(non_numeric_data, column = "value") # This should throw an error
+```
+
+# Exercise 4: Test the Function
+
+```{r, error = TRUE}
+library(testthat)
+
+# Simple dataset for testing
+simple_data <- data.frame(value = c(1, 2, 3, 4, 5))
+
+test_that("calc_mean_sd works with a simple dataset", {
+  result <- calc_mean_sd(simple_data, column = "value")
+  expect_equal(result$mean, 3)
+  expect_equal(result$sd, 1.581139, tolerance = 1e-6)
+})
+
+test_that("calc_mean_sd handles NA values correctly", {
+  simple_data_na <- data.frame(value = c(1, 2, 3, NA, 5))
+  result <- calc_mean_sd(simple_data_na, column = "value", na.rm = TRUE)
+  expect_equal(result$mean, 2.75)
+  expect_equal(result$sd, 1.707825, tolerance = 1e-6)
+})
+
+test_that("calc_mean_sd throws an error for non-numeric column", {
+  non_numeric_data <- data.frame(value = c("a", "b", "c", "d", "e"))
+  expect_error(calc_mean_sd(non_numeric_data, column = "value"), "The specified column must be numeric.")
+})
+```
